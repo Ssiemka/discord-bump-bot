@@ -1,0 +1,23 @@
+name: Bump Gotryl
+
+on:
+  schedule:
+    - cron: "30 0,2,4,6,8,10,12,14,16,18,20,22 * * *"
+  workflow_dispatch:
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install aiohttp
+      - name: Bump Gotryl
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          GUILD_ID: "1490990573388300399"
+          CHANNEL_ID: "1496869622195032295"
+          SERVER_NAME: "Gotryl"
+        run: python bump.py
