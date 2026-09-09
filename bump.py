@@ -22,6 +22,8 @@ SERVER     = os.environ.get("SERVER_NAME", "Server")
 
 DISBOARD_APP_ID = "302050872383242240"
 COOLDOWN_SECS   = 7230  # 2h0m30s — 30s buffer above DISBOARD's 2h cooldown
+JITTER_MIN_SECS = 60    # extra random delay after cooldown clears, so bumps
+JITTER_MAX_SECS = 600   # don't land at a fixed offset every cycle (1-10 min)
 
 HEADERS = {
     "Authorization": TOKEN,
@@ -94,6 +96,11 @@ async def main():
 
         # Step 1: wait for cooldown if needed
         await wait_for_cooldown(session)
+
+        # Step 1b: random jitter so bumps don't land at a fixed offset every cycle
+        jitter = random.randint(JITTER_MIN_SECS, JITTER_MAX_SECS)
+        print(f"[{SERVER}] Jitter delay: {jitter}s ({jitter/60:.1f} min).")
+        await asyncio.sleep(jitter)
 
         # Step 2: fetch /bump command
         cmd_url = f"https://discord.com/api/v9/guilds/{GUILD_ID}/application-command-index"
