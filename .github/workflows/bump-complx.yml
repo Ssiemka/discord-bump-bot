@@ -6,7 +6,7 @@ on:
 jobs:
   bump:
     runs-on: ubuntu-latest
-    timeout-minutes: 145
+    timeout-minutes: 130
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

@@ -46,19 +46,17 @@ commit it** — this repo is public. `bump.py` reads it only from `os.environ`.
   this bug returns.
 - **No per-request timeout on the old `aiohttp.ClientSession`** meant a stalled Discord API call
   could hang a job for hours with no error (GitHub Actions' default job timeout is 6h). Fixed by
-  setting `ClientTimeout(total=60)` on the session (2026-09-09). Job-level `timeout-minutes: 145`
-  is also set as a backstop — kept above the worst-case cooldown wait + jitter (~130.5 min) so it
-  never kills a legitimate run.
+  setting `ClientTimeout(total=60)` on the session (2026-09-09). Job-level `timeout-minutes: 130`
+  is also set as a backstop — kept above `COOLDOWN_SECS` (~120.5 min) so it never kills a
+  legitimate cooldown wait.
 
-## Timing / jitter
+## Timing
 
-Bumps landing at *exactly* the same offset every 2h is itself a bot fingerprint. `bump.py` adds
-a random 1–10 min delay (`JITTER_MIN_SECS`/`JITTER_MAX_SECS`) after the DISBOARD cooldown clears
-and before sending, so actual bump timestamps vary cycle to cycle instead of being on-the-dot.
-This is independent of cron-job.org's own dispatch schedule — cron-job.org can fire on a fixed
-2h clock; the jitter inside `bump.py` is what makes the *visible* bump timing irregular. If you
-widen `JITTER_MAX_SECS`, re-check `timeout-minutes` in both workflows still covers
-`COOLDOWN_SECS + JITTER_MAX_SECS` + overhead.
+Bumps fire at a fixed `COOLDOWN_SECS` (2h0m30s) after the previous one — deterministic, no
+jitter, by explicit owner choice (2026-09-09) after being told a perfectly regular interval is
+itself a bot fingerprint and increases ban exposure. A jittered version (random 1–10 min delay
+after cooldown clears) was shipped and then reverted same-day at the owner's request — see git
+history around commits `48886fb` / this one if reconsidering.
 
 ## Ban risk — read before changing anything that increases exposure
 
