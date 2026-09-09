@@ -1,13 +1,12 @@
 name: Bump ComplxCulture
 
 on:
-  schedule:
-    - cron: "30 1,3,5,7,9,11,13,15,17,19,21,23 * * *"
   workflow_dispatch:
 
 jobs:
   bump:
     runs-on: ubuntu-latest
+    timeout-minutes: 130
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

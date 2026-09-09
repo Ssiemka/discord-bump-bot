@@ -89,7 +89,8 @@ async def wait_for_cooldown(session):
 
 
 async def main():
-    async with aiohttp.ClientSession() as session:
+    timeout = aiohttp.ClientTimeout(total=60)
+    async with aiohttp.ClientSession(timeout=timeout) as session:
 
         # Step 1: wait for cooldown if needed
         await wait_for_cooldown(session)
